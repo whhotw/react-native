@@ -66,8 +66,6 @@ import com.facebook.react.views.webview.events.TopMessageEvent;
 import org.json.JSONObject;
 import org.json.JSONException;
 
-import static com.sun.xml.internal.ws.policy.sourcemodel.wspolicy.XmlToken.Uri;
-
 /**
  * Manages instances of {@link WebView}
  *
