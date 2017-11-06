@@ -12,6 +12,8 @@ package com.facebook.react.views.webview;
 import javax.annotation.Nullable;
 
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -155,9 +157,22 @@ public class ReactWebViewManager extends SimpleViewManager<WebView> {
     }
 
     @Override
-    public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-      handler.proceed();
-      super.onReceivedSslError(view, handler, error);
+    public void onReceivedSslError(WebView view, final SslErrorHandler handler, SslError error) {
+      SslCertificate serverCertificate = error.getCertificate();
+
+      if (error.hasError(SslError.SSL_UNTRUSTED)) {
+        // Check if Cert-Domain equals the Uri-Domain
+        String certDomain = serverCertificate.getIssuedTo().getCName();
+        try {
+          if(certDomain.equals(new URL(error.getUrl()).getHost())) {
+            handler.proceed();
+          }
+        } catch (MalformedURLException e) {
+          handler.cancel();
+        }
+      } else {
+        super.onReceivedSslError(view, handler, error);
+      }
     }
 
     @Override
